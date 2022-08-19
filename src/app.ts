@@ -1,9 +1,10 @@
 import dotenv from "dotenv"
-import express from "express"
+dotenv.config()
+import express, { Request, Response } from "express"
 import morgan from "morgan"
 import cors from "cors"
+require("./database")
 
-dotenv.config()
 const app = express()
 
 // Settings
