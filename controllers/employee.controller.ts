@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express"
 import { EmployeeError } from "../errors/employee.error"
 
-const EmployeeSchema = require("../models/employee")
+const EmployeeSchema = require("../models/employee.model")
 
 interface Employee {
   name: string,
@@ -21,7 +21,6 @@ export const getEmployees = async (_req: Request, res: Response, next: NextFunct
     return await EmployeeSchema.find()
       .then((employees: Array<Employee>) => {
         if(employees.length === 0) {
-          console.log(employees.length)
           throw new EmployeeError(404, "No employees found!")
         }
         return res.status(200).json(employees)
@@ -35,10 +34,10 @@ export const getEmployees = async (_req: Request, res: Response, next: NextFunct
 
 export const getEmployee = async (req: Request, res: Response, next: NextFunction): Promise<Response | undefined> => {
   try {
-    return await EmployeeSchema.find({ _id: req.params.id })
-      .then((employee: Array<Employee>) => {
-        if(!employee[0]) { 
-          throw new EmployeeError(404, `No employee found with file ${req.params.fileNumber}`)
+    return await EmployeeSchema.findById(req.params.id)
+      .then((employee: Employee) => {
+        if(!employee) {
+          throw new EmployeeError(404, `No employee found with id ${req.params.id}`)
         }
         return res.status(200).json(employee)
       })
