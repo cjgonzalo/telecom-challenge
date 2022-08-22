@@ -4,7 +4,6 @@ import {
   deleteEmployee,
   getEmployee,
   getEmployees,
-  getEmployeeByFileNumber,
   updateEmployee,
   sendEmployeeInfo
 } from "../controllers/employee.controller";
