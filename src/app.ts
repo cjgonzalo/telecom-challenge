@@ -6,11 +6,12 @@ import cors from "cors"
 require("./database")
 import employeeRouter from "../routes/employee.router"
 import { EmployeeError } from "../errors/employee.error"
+import { config } from "../config"
 
 const app = express()
 
 // Settings
-app.set("port", process.env.APP_PORT || 8080)
+app.set("port", config.APP_PORT || 8080)
 
 // Middlewares
 app.use(morgan("dev"))
