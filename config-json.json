@@ -7,7 +7,7 @@
     "DB_URI": "mongodb://localhost:27017/local",
     "APP_PORT": 4001
   },
-  "test": {
+  "local": {
     "DB_URI": "mongodb://localhost:27017/local",
     "APP_PORT": 4002
   }

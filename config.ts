@@ -8,13 +8,18 @@ interface Environment {
 interface Config {
   production: Environment,
   development: Environment,
-  test: Environment
+  local: Environment
 }
 
+// Config Singleton (clase que solo se instancia una vez), 
+// para así solo leer el archivo config-json una sola vez y no leerlo cada vez que se necesite
 class ConfigHandler {
+  private config: Config
   private static instance: ConfigHandler
 
-  private constructor() { }
+  private constructor() { 
+    this.config = JSON.parse(String(fs.readFileSync("./config-json.json")))
+  }
 
   public static getInstance(): ConfigHandler {
     if(!ConfigHandler.instance) {
@@ -23,14 +28,13 @@ class ConfigHandler {
     return ConfigHandler.instance
   }
 
-  public getEnvironment = (): Environment => {
-    const config: Config = JSON.parse(String(fs.readFileSync("./config-json.json")))
+  public getEnvironment = (): Environment => {  
     if(process.env.NODE_ENV === "production") {
-      return config.production
+      return this.config.production
     } else if(process.env.NODE_ENV === "development") {
-      return config.development
+      return this.config.development
     } else {
-      return config.test
+      return this.config.local
     }
   }
 }
