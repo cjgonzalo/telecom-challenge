@@ -2,22 +2,24 @@ import { Request, Response, NextFunction } from "express"
 import { EmployeeError } from "../errors/employee.error"
 import { removeFile, writeFile } from "../helpers/file-writer"
 import { Email, sendEmail } from "../helpers/mail-sender.helper"
-import path from "path"
+import { getAllDependents } from "../helpers/employee.helper"
 
 const EmployeeModel = require("../models/employee.model")
 
+// Interfaz empleado que respeta EmployeeSchema
 export interface Employee {
   nombre: string,
   apellido: string,
   legajo: string,
-  dni: string,
+  dni: Number,
   fecha_cumpleanios: string,
   rol: string,
-  dni_jefe?: string,
+  dni_jefe?: Number,
   gerencia: string,
   sector: string,
 
-  getAge(self: Employee): number
+  getAge(): number
+  getImmediateDependents(): Array<Employee>
 }
 
 // Returns all the existing employees
@@ -96,16 +98,18 @@ export const deleteEmployee = async (req: Request, res: Response, next: NextFunc
 
 export const sendEmployeeInfo = async (req: Request, res: Response, next: NextFunction): Promise<Response | undefined> => {
   try {
-    const employee = await EmployeeModel.find()//EmployeeModel.findById(req.params.id)
-    writeFile(employee)
-    const xlsxPath = path.join(__dirname, `../temp/Info_${employee[0].apellido}_${employee[0].nombre}.xlsx`)
+    const employee = await EmployeeModel.findById(req.params.id)
+    const dependents = await getAllDependents(employee, []) // El acumulador empieza como un array vacío
 
+    const xlsxPath = writeFile(employee, dependents)
+
+    // TODO: usar mail real
     const email: Email = {
       from: "",
       to: "",
-      subject: `Info of ${employee[0].apellido}, ${employee[0].nombre}`,
+      subject: `Info of ${employee.apellido}, ${employee.nombre}`,
       attachments: [{
-          filename: `Info_${employee[0].apellido}_${employee[0].nombre}.xlsx`,
+          filename: `Info_${employee.apellido}_${employee.nombre}.xlsx`,
           path: xlsxPath
       }]
     }
