@@ -12,24 +12,27 @@ interface Config {
 }
 
 class ConfigHandler {
-  private config: Config
-  private environment: Environment
-  
-  constructor() {
-    this.config = JSON.parse(String(fs.readFileSync("./config-json.json")))
-      
-    if(process.env.NODE_ENV === "production") {
-      this.environment = this.config.production
-    } else if(process.env.NODE_ENV === "development") {
-      this.environment = this.config.development
-    } else {
-      this.environment = this.config.test
+  private static instance: ConfigHandler
+
+  private constructor() { }
+
+  public static getInstance(): ConfigHandler {
+    if(!ConfigHandler.instance) {
+      ConfigHandler.instance = new ConfigHandler()
     }
+    return ConfigHandler.instance
   }
 
   public getEnvironment = (): Environment => {
-    return this.environment
+    const config: Config = JSON.parse(String(fs.readFileSync("./config-json.json")))
+    if(process.env.NODE_ENV === "production") {
+      return config.production
+    } else if(process.env.NODE_ENV === "development") {
+      return config.development
+    } else {
+      return config.test
+    }
   }
 }
 
-export const config = new ConfigHandler().getEnvironment()
+export const config = ConfigHandler.getInstance().getEnvironment()
