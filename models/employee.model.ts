@@ -3,8 +3,8 @@ import { Schema, model } from "mongoose";
 const employeeSchema = new Schema({
   nombre: { type: String, required: true, trim: true },
   apellido: { type: String, required: true, trim: true },
-  legajo: { type: String, required: true, trim: true },
-  dni: { type: Number, required: true },
+  legajo: { type: String, required: true, trim: true, unique: true },
+  dni: { type: Number, required: true, unique: true },
   fecha_cumpleanios: { type: String, required: true, trim: true },
   rol: { type: String, required: true, trim: true },
   dni_jefe: { type: Number },
@@ -15,14 +15,17 @@ const employeeSchema = new Schema({
 // Método que devuelve la edad del empleado solicitado
 employeeSchema.methods.getAge = function(): number {
   const dateParts = this.fecha_cumpleanios.split("/")
+  const birthYear = Number(dateParts[2])
+  const birthMonth = Number(dateParts[1])
+  const birthDay = Number(dateParts[0])
   const now = new Date()
   if( // todavía no cumplió años
-    now.getMonth() < Number(dateParts[1]) ||
-    now.getMonth() === Number(dateParts[1]) && now.getDay() < Number(dateParts[0])
+    now.getMonth() < birthMonth ||
+    now.getMonth() === birthMonth && now.getDay() < birthDay
   ) {
-    return now.getFullYear() - Number(dateParts[2]) - 1
+    return now.getFullYear() - birthYear - 1
   } else { // ya cumplió años este año
-    return now.getFullYear() - Number(dateParts[2])
+    return now.getFullYear() - birthYear
   }
 }
 
