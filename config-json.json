@@ -1,14 +1,20 @@
 {
   "production": {
     "DB_URI": "mongodb://localhost:27017/local",
-    "APP_PORT": 4000
+    "APP_PORT": 4000,
+    "EMAIL_ADDRESS": "telecomchallenge.tc@gmail.com",
+    "EMAIL_APP_PASS": "siqrqmtmfykeipvl"
   },
   "development": {
     "DB_URI": "mongodb://localhost:27017/local",
-    "APP_PORT": 4001
+    "APP_PORT": 4001,
+    "EMAIL_ADDRESS": "telecomchallenge.tc@gmail.com",
+    "EMAIL_APP_PASS": "siqrqmtmfykeipvl"
   },
   "local": {
     "DB_URI": "mongodb://localhost:27017/local",
-    "APP_PORT": 4002
+    "APP_PORT": 4002,
+    "EMAIL_ADDRESS": "telecomchallenge.tc@gmail.com",
+    "EMAIL_APP_PASS": "siqrqmtmfykeipvl"
   }
 }

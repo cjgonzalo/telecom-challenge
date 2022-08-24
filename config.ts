@@ -2,7 +2,9 @@ import fs from "fs"
 
 interface Environment {
   DB_URI: string,
-  APP_PORT: number
+  APP_PORT: number,
+  EMAIL_ADDRESS: string,
+  EMAIL_APP_PASS: string
 }
 
 interface Config {
