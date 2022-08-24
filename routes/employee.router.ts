@@ -3,6 +3,7 @@ import {
   createEmployee,
   deleteEmployee,
   getEmployee,
+  getEmployeeByFileNumber,
   getEmployees,
   updateEmployee,
   sendEmployeeInfo
@@ -14,8 +15,8 @@ router.route("/")
   .get(getEmployees)
   .post(createEmployee)
 
-router.route("/:id")
-  .get(getEmployee)
+router.route("/:filter")
+  .get(getEmployee, getEmployeeByFileNumber)
   .put(updateEmployee)
   .delete(deleteEmployee)
 
