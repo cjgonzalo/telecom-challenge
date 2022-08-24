@@ -1,4 +1,7 @@
 import nodemailer from "nodemailer";
+import { config } from "../config";
+import { Employee } from "../controllers/employee.controller";
+import path from "path"
 
 export interface Email {
   from: string,
@@ -8,19 +11,28 @@ export interface Email {
   attachments: Array<Object>
 }
 
+export const buildEmail = (recipents: Array<string>, employee: Employee): Email => {
+  const recipentsString = recipents.join(",")
+  const filename = `Info_${employee.apellido}_${employee.nombre}.xlsx`
+  return {
+    from: config.EMAIL_ADDRESS,
+    to: recipentsString,
+    subject: `Info of ${employee.apellido}, ${employee.nombre}`,
+    attachments: [{
+        filename: filename,
+        path: path.join(__dirname, `../temp/${filename}`)
+    }]
+  }
+}
+
 export const sendEmail = async (email: Email) => { 
-  const testAccount = await nodemailer.createTestAccount()
   const transporter = nodemailer.createTransport({
-    host: "smtp.ethereal.email",
-    port: 587,
-    secure: false,
+    service: "gmail",
     auth: {
-      user: testAccount.user,
-      pass: testAccount.pass
+      user: config.EMAIL_ADDRESS,
+      pass: config.EMAIL_APP_PASS
     }
   })
-  email.from = testAccount.user
-  email.to = testAccount.user
 
-  await transporter.sendMail(email).then(info => console.log(nodemailer.getTestMessageUrl(info)))
+  await transporter.sendMail(email)
 }
