@@ -1,8 +1,9 @@
 import { Request, Response, NextFunction } from "express"
 import { EmployeeError } from "../errors/employee.error"
 import { removeFile, writeFile } from "../helpers/file-writer"
-import { Email, sendEmail } from "../helpers/mail-sender.helper"
-import { getAllDependents } from "../helpers/employee.helper"
+import { buildEmail, Email, sendEmail } from "../helpers/mail-sender.helper"
+import { getAllDependents, validEmail } from "../helpers/employee.helper"
+import { isValidObjectId } from "mongoose"
 
 const EmployeeModel = require("../models/employee.model")
 
@@ -19,7 +20,7 @@ export interface Employee {
   sector: string,
 
   getAge(): number
-  getImmediateDependents(): Array<Employee>
+  getImmediateDependents(): Promise<Array<Employee>>
 }
 
 // Returns all the existing employees
@@ -39,16 +40,39 @@ export const getEmployees = async (_req: Request, res: Response, next: NextFunct
   }
 }
 
-export const getEmployee = async (req: Request, res: Response, next: NextFunction): Promise<Response | undefined> => {
+export const getEmployee = async (req: Request, res: Response, next: NextFunction): Promise<Response | undefined | void> => {
   try {
-    return await EmployeeModel.findById(req.params.id)
+    // Si el filtro recibidono es un id se pasa al siguiente controlador
+    if(!isValidObjectId(req.params.filter)) {
+      return next()
+    }
+
+    return await EmployeeModel.findById(req.params.filter)
       .then((employee: Employee) => {
         if(!employee) {
-          throw new EmployeeError(404, `No employee found with id ${req.params.id}`)
+          throw new EmployeeError(404, `No employee found with id ${req.params.filter}`)
         }
         return res.status(200).json(employee)
       })
       .catch((error: any) => { throw error })
+
+  } catch(error: any) {
+    next(error)
+  }
+}
+
+export const getEmployeeByFileNumber = async (req: Request, res: Response, next: NextFunction): Promise<Response | undefined> => {
+  try {
+    return await EmployeeModel.findOne({
+      legajo: req.params.filter
+    })
+    .then((employee: Employee) => {
+      if(!employee) {
+        throw new EmployeeError(404, `No employee found with file ${req.params.filter}`)
+      }
+      return res.status(200).json(employee)
+    })
+    .catch((error: any) => { throw error })
 
   } catch(error: any) {
     next(error)
@@ -74,7 +98,7 @@ export const updateEmployee = async (req: Request, res: Response, next: NextFunc
     const employeeFields = req.body as Employee
 
     return await EmployeeModel.findOneAndUpdate(
-      { _id: req.params.id },
+      { _id: req.params.filter },
       employeeFields
     )
     .then((updatedEmployee: Employee) => res.status(200).json(updatedEmployee))
@@ -88,7 +112,7 @@ export const updateEmployee = async (req: Request, res: Response, next: NextFunc
 export const deleteEmployee = async (req: Request, res: Response, next: NextFunction): Promise<Response | undefined> => {
   try {
     return await EmployeeModel.findOneAndDelete({
-      _id: req.params.id
+      _id: req.params.filter
     })
     .then((deletedEmployee: Employee) => res.status(200).json(deletedEmployee))
   } catch(error: any) {
@@ -98,21 +122,22 @@ export const deleteEmployee = async (req: Request, res: Response, next: NextFunc
 
 export const sendEmployeeInfo = async (req: Request, res: Response, next: NextFunction): Promise<Response | undefined> => {
   try {
-    const employee = await EmployeeModel.findById(req.params.id)
-    const dependents = await getAllDependents(employee, []) // El acumulador empieza como un array vacío
-
-    const xlsxPath = writeFile(employee, dependents)
-
-    // TODO: usar mail real
-    const email: Email = {
-      from: "",
-      to: "",
-      subject: `Info of ${employee.apellido}, ${employee.nombre}`,
-      attachments: [{
-          filename: `Info_${employee.apellido}_${employee.nombre}.xlsx`,
-          path: xlsxPath
-      }]
+    const recipents: Array<string> = req.body.recipents
+    if(recipents.length === 0) {
+      throw new EmployeeError(400, "At least one recipent is required")
     }
+
+    recipents.forEach(recipent => {
+      if(!validEmail(recipent)) {
+        throw new EmployeeError(402, `${recipent} is not a valid email address`)
+      }
+    })
+
+    const employee = await EmployeeModel.findById(req.params.id)
+    const dependentsInfo = await getAllDependents(employee, []) // El acumulador empieza como un array vacío
+    const xlsxPath = writeFile(employee, dependentsInfo)
+    
+    const email: Email = buildEmail(recipents, employee)
     await sendEmail(email)
     removeFile(xlsxPath)
 

@@ -4,20 +4,20 @@ import fs from "fs"
 import path from "path"
 
 // Función que escribe un archivo CSV, lo transforma en el excel a exportar y devuelve el path donde se guarda
-export const writeFile = (employee: Employee, dependents: Array<Employee>): string => {
-
+export const writeFile = (employee: Employee, dependents: Array<string>): string => {
+  // Escribo el header y el contenido del archivo CSV
   let content: string = writeHeader()
+  const bossInfo = getEmployeeInfo(employee, "")
+  const employees = [bossInfo, ...dependents]
+  content += employees.join("")
 
-  const employees = [employee, ...dependents]
-
-  // Por cada empleado se escribe una linea del archivo CSV
-  employees.forEach(employee => {
-    content += writeLine(employee)
-  })
-
+  // Escribo el archivo CSV, si ya existía uno se reemplaza
   const csvPath: string = path.join(__dirname, `../temp/Info_${employee.apellido}_${employee.nombre}.csv`)
+  fs.existsSync(csvPath) && removeFile(csvPath)
   fs.writeFileSync(csvPath, content)
+
   const xlsxPath = path.join(__dirname, `../temp/Info_${employee.apellido}_${employee.nombre}.xlsx`)
+  fs.existsSync(xlsxPath) && removeFile(xlsxPath)
 
   try {
     convertCsvToXlsx(csvPath, xlsxPath)
@@ -35,8 +35,8 @@ const writeHeader = (): string => {
 }
 
 // Linea CSV que contiene la información del empleado
-const writeLine = (employee: Employee): string => {
-  return `${employee.apellido} ${employee.nombre},${employee.legajo},${employee.dni},${employee.getAge()},${employee.rol},${employee.dni_jefe ? employee.dni_jefe : ""},${employee.gerencia},${employee.sector}\n`
+export const getEmployeeInfo = (employee: Employee, bossName: string): string => {
+  return `${employee.apellido} ${employee.nombre},${employee.legajo},${employee.dni},${employee.getAge()},${employee.rol},${bossName},${employee.gerencia},${employee.sector}\n`
 }
 
 export const removeFile = (path: string) => {
