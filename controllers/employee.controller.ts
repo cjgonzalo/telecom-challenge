@@ -148,7 +148,7 @@ export const sendEmployeeInfo = async (req: Request, res: Response, next: NextFu
     await sendEmail(email)
     removeFile(xlsxPath)
 
-    return res.status(200).json({ message: "Email successfully sended, if you can't see it, please check out your spam box" })
+    return res.status(200).json({ message: "Email successfully sended, if you can't find it, please check out your spam box" })
   } catch(error: any) {
     next(error)
   }
