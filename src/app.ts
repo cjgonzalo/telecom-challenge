@@ -5,7 +5,7 @@ import cors from "cors"
 import employeeRouter from "../routes/employee.router"
 import { EmployeeError } from "../errors/employee.error"
 import { config } from "../config"
-require("./database")
+import { connectDatabase } from "./database"
 
 dotenv.config()
 const app = express()
@@ -35,6 +35,9 @@ app.use((_req: Request, res: Response) => {
   return res.status(404).json({ message: "Page not found" })
 })
 
-app.listen(app.get("port"), () => {
+export const server = app.listen(app.get("port"), async () => {
+  await connectDatabase()
   console.log(`App listening on port ${app.get("port")}`)
 })
+
+// module.exports = server
