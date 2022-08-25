@@ -25,13 +25,14 @@
 
 ### Rutas: 
 (para los ejemplos se utiliza el entorno local, si se utiliza otro entorno los puertos varían. Ver archvio <code>config-json.json</code> para saber cual usar)
+
 #### <code>http://localhost:4002/employee</code>
 #### Metodos
 <ul>
   <li>
     GET: Retorna lista completa de empleados en la base de datos
   <li>
-    POST: Crea un nuevo empleado con los datos ingresados en el body, los datos envíados deben respetar la interfaz Employee
+    POST: Crea un nuevo empleado con los datos ingresados en el body, los datos envíados deben respetar la interfaz Employee (declarada en employee.controller)
   </li>
 </ul>
 
@@ -48,7 +49,7 @@
     PUT: Modifica el empleado según el filtro solicitado, los campos a modificar se envían en el body de la petición
   </li>
   <li>
-    DELETE: Elimina el empleado que satisfaga solicitado
+    DELETE: Elimina el empleado que satisfaga el filtro solicitado
   </li>
 </ul>
 
