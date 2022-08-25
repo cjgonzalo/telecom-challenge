@@ -96,13 +96,16 @@ export const createEmployee = async (req: Request, res: Response, next: NextFunc
 export const updateEmployee = async (req: Request, res: Response, next: NextFunction): Promise<Response | undefined> => {
   try {
     const employeeFields = req.body as Employee
+    const filter = isValidObjectId(req.params.filter) ?
+      { _id: req.params.filter } :
+      { legajo: req.params.filter }
 
     return await EmployeeModel.findOneAndUpdate(
-      { _id: req.params.filter },
-      employeeFields
-    )
-    .then((updatedEmployee: Employee) => res.status(200).json(updatedEmployee))
-    .catch((error: any) => { throw error })
+        filter,
+        employeeFields
+      )
+      .then((employee: Employee) => res.status(200).json(employee))
+      .catch((error: any) => { throw error })
 
   } catch(error: any) {
     next(error)
@@ -111,10 +114,14 @@ export const updateEmployee = async (req: Request, res: Response, next: NextFunc
 
 export const deleteEmployee = async (req: Request, res: Response, next: NextFunction): Promise<Response | undefined> => {
   try {
-    return await EmployeeModel.findOneAndDelete({
-      _id: req.params.filter
-    })
-    .then((deletedEmployee: Employee) => res.status(200).json(deletedEmployee))
+    const filter = isValidObjectId(req.params.filter) ?
+      { _id: req.params.filter } :
+      { legajo: req.params.filter }
+
+    return await EmployeeModel.findOneAndDelete(filter)
+      .then((deletedEmployee: Employee) => res.status(200).json(deletedEmployee))
+      .catch((error: any) => { throw error })
+
   } catch(error: any) {
     next(error)
   }
