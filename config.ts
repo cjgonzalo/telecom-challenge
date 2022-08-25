@@ -13,8 +13,7 @@ interface Config {
   local: Environment
 }
 
-// Config Singleton (clase que solo se instancia una vez), 
-// para así solo leer el archivo config-json una sola vez y no leerlo cada vez que se necesite
+// Config Singleton para solo leer el archivo config-json una sola vez y no leerlo cada vez que se necesite
 class ConfigHandler {
   private config: Config
   private static instance: ConfigHandler
