@@ -104,7 +104,7 @@ export const updateEmployee = async (req: Request, res: Response, next: NextFunc
         filter,
         employeeFields
       )
-      .then((employee: Employee) => res.status(200).json(employee))
+      .then(() => res.status(200).json({ message: "Employee successfully updated!" }))
       .catch((error: any) => { throw error })
 
   } catch(error: any) {
