@@ -2,3 +2,5 @@
 
 # Enviroment Variables
 .env
+
+/coverage/
