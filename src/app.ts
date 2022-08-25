@@ -1,13 +1,13 @@
-import dotenv from "dotenv"
-dotenv.config()
 import express, { NextFunction, Request, Response} from "express"
+import dotenv from "dotenv"
 import morgan from "morgan"
 import cors from "cors"
-require("./database")
 import employeeRouter from "../routes/employee.router"
 import { EmployeeError } from "../errors/employee.error"
 import { config } from "../config"
+require("./database")
 
+dotenv.config()
 const app = express()
 
 // Settings
