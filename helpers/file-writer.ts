@@ -4,11 +4,13 @@ import fs from "fs"
 import path from "path"
 
 // Función que escribe un archivo CSV, lo transforma en el excel a exportar y devuelve el path donde se guarda
-export const writeFile = (employee: Employee, dependents: Array<string>): string => {
+export const writeFile = async (employee: Employee, dependents: Array<string>): Promise<string> => {
   // Escribo el header y el contenido del archivo CSV
   let content: string = writeHeader()
-  const bossInfo = getEmployeeInfo(employee, "")
-  const employees = [bossInfo, ...dependents]
+  const boss = await employee.getBoss()
+  const bossName = boss ? `${boss.nombre} ${boss.apellido}` : ""
+  const employeeInfo = getEmployeeInfo(employee, bossName)
+  const employees = [employeeInfo, ...dependents]
   content += employees.join("")
 
   // Escribo el archivo CSV, si ya existía uno se reemplaza

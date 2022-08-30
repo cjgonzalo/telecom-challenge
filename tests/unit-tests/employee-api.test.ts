@@ -1,10 +1,6 @@
 import request from "supertest"
 import { server } from "../../src/app"
 import mongoose from "mongoose"
-import { getEmployeeInfo, writeFile } from "../../helpers/file-writer"
-import { sendEmail } from "../../helpers/mail-sender.helper"
-import { getAllDependents } from "../../helpers/employee.helper"
-import { Employee } from "../../controllers/employee.controller"
 
 describe("employee controllers tests", () => {
   const EmployeeModel = require("../../models/employee.model")

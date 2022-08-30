@@ -41,7 +41,19 @@ employeeSchema.methods.getImmediateDependents = async function() {
   } catch(error: any) {
     throw error
   }
+}
 
+// Metodo que devuelve el jefe directo de un empleado
+employeeSchema.methods.getBoss = async function() {
+  try {
+    return await model("EmployeeSchema", employeeSchema).find({
+      dni: this.dni_jefe
+    })
+    .then(boss => boss[0])
+    .catch(error => { throw error })
+  } catch(error: any) {
+    throw error
+  }
 }
 
 module.exports = model("EmployeeSchema", employeeSchema)

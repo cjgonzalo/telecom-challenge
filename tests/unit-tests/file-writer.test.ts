@@ -19,6 +19,7 @@ describe("file writer tests", () => {
 
     getAge() { return 30 },
     getImmediateDependents() { return Promise.resolve([]) },
+    getBoss() { return Promise.resolve(undefined) }
   }
 
   describe("get employee info test", () => {
@@ -29,11 +30,11 @@ describe("file writer tests", () => {
   })
 
   describe("write file test", () => {
-    it("should return the path of the file", () => {
+    it("should return the path of the file", async () => {
       jest.fn(writeFile)
-        .mockImplementation((employee, dependents) => path.join(__dirname, `../../temp/Info_${employee.apellido}_${employee.nombre}.xlsx`))
+        .mockImplementation((employee, dependents) => Promise.resolve(path.join(__dirname, `../../temp/Info_${employee.apellido}_${employee.nombre}.xlsx`)))
       
-      const filePath = writeFile(roberto, [])
+      const filePath = await writeFile(roberto, [])
       expect(filePath).toEqual(path.join(__dirname, `../../temp/Info_${roberto.apellido}_${roberto.nombre}.xlsx`))
       fs.unlinkSync(filePath)
     })

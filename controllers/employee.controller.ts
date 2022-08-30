@@ -21,6 +21,7 @@ export interface Employee {
 
   getAge(): number
   getImmediateDependents(): Promise<Array<Employee>>
+  getBoss(): Promise<Employee | undefined>
 }
 
 // Returns all the existing employees
@@ -142,7 +143,7 @@ export const sendEmployeeInfo = async (req: Request, res: Response, next: NextFu
 
     const employee = await EmployeeModel.findById(req.params.id)
     const dependentsInfo = await getAllDependents(employee, []) // El acumulador empieza como un array vacío
-    const xlsxPath = writeFile(employee, dependentsInfo)
+    const xlsxPath = await writeFile(employee, dependentsInfo)
     
     const email: Email = buildEmail(recipents, employee)
     await sendEmail(email)

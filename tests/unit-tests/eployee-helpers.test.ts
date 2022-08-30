@@ -30,6 +30,7 @@ describe("employee helpers tests", () => {
 
       getAge() { return 30 },
       getImmediateDependents() { return Promise.resolve([]) },
+      getBoss() { return Promise.resolve(marcelo)}
     }
   
     const marcelo: Employee = {
@@ -44,6 +45,7 @@ describe("employee helpers tests", () => {
 
       getAge() { return 40 },
       getImmediateDependents() { return Promise.resolve([roberto]) },
+      getBoss() { return Promise.resolve(undefined) }
     }
 
     it("should return an [roberto]", async () => {
